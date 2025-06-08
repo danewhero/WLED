@@ -10,9 +10,9 @@ Multiple Effects can be specified inside this single usermod, as we will illustr
 
 The `user_fx.cpp` file can be broken down into four main parts:
 * **static effect definition** - This is a static LED setting that is displayed if an effect fails to initialize.
-* User FX function definition(s) - This area is where you place the FX code for all of the custom effects you want to use.  This mainly includes the FX code and the static variable containing the [metadata string](https://kno.wled.ge/interfaces/json-api/#effect-metadata). 
-* Usermod Class definition(s) - The class definition defines the blueprint from which all your custom Effects (or any usermod, for that matter) are created.
-* Usermod registration - All usermods have to be registered so that they are able to be compiled into your binary.
+* **User FX function definition(s)** - This area is where you place the FX code for all of the custom effects you want to use.  This mainly includes the FX code and the static variable containing the [metadata string](https://kno.wled.ge/interfaces/json-api/#effect-metadata). 
+* **Usermod Class definition(s)** - The class definition defines the blueprint from which all your custom Effects (or any usermod, for that matter) are created.
+* **Usermod registration** - All usermods have to be registered so that they are able to be compiled into your binary.
 
 We will go into greater detail on how custom effects work in the usermod and how to go abour creating your own in the section below.
 
@@ -21,7 +21,7 @@ We will go into greater detail on how custom effects work in the usermod and how
 
 In this section we give some advice to those who are new to WLED Effect creation.  We will illustrate how to load in multiple Effects using this single usermod, and we will do a deep dive into the anatomy of a 1D Effect as well as a 2D Effect.
 
-The first line of the code
+The first line of the code imports the `[wled.h](https://kno.wled.ge/interfaces/json-api/#effect-metadata)` file into this module.  This file is the 
 
 Currently set in the code have the pixels be all black, but can be modified to take on a different behavior.  For example, say you wanted to...
 TODO
