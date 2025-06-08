@@ -39,7 +39,53 @@ The effect starts off by checking to see if the segment that the effect is being
 if (!strip.isMatrix || !SEGMENT.is2D()) 
 return mode_static();  // not a 2D set-up 
 ```
-TODO
+The next code block contains several constant variable definitions, which we will walk through one by one:
+* `const int cols = SEG_W;` Assigns the number of columns (width) in the active segment to cols.
+
+SEG_W is a macro defined in WLED that expands to SEGMENT.width().
+
+Why: This is the width of your 2D matrix segment, used to traverse the matrix correctly.
+
+const int rows = SEG_H;
+Meaning: Assigns the number of rows (height) in the segment to rows.
+
+SEG_H is a macro for SEGMENT.height().
+
+Why: Combined with cols, this allows pixel addressing in 2D (x, y) space.
+
+const auto XY = [&](int x, int y) { return x + y * cols; };
+Meaning: Declares a lambda function named XY to convert (x, y) matrix coordinates into a 1D index in the LED array.
+
+Formula: This assumes row-major order (left to right, top to bottom).
+
+Why: WLED internally treats the LED strip as a 1D array, so effects must translate 2D coordinates into 1D indices. This lambda helps with that.
+
+const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);
+Meaning: Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.
+
+Why: This determines how often the effect should refresh per second. Higher speed = more frames per second.
+
+const unsigned refresh_ms = 1000 / refresh_hz;
+Meaning: Converts refresh rate from Hz to milliseconds.
+
+Why: It’s easier to schedule animation updates in WLED using elapsed time in milliseconds. This value is used to time when to update the effect.
+
+const int16_t diffusion = map(SEGMENT.custom1, 0, 255, 0, 100);
+Meaning: Uses the custom1 control (0–255 range, usually exposed via sliders) to define the diffusion rate, mapped to 0–100.
+
+Why: This controls how much "heat" spreads to neighboring pixels — more diffusion = smoother flame spread.
+
+const uint8_t spark_rate = SEGMENT.intensity;
+Meaning: Assigns SEGMENT.intensity (user input 0–255) to a variable named spark_rate.
+
+Why: Controls how frequently new "spark" pixels appear at the bottom of the matrix. A higher value means more frequent ignition of flame points.
+
+const uint8_t turbulence = SEGMENT.custom2;
+Meaning: Stores the user-defined custom2 value to a variable called turbulence.
+
+Why: This is used to introduce randomness in spark generation or flow — more turbulence means more chaotic behavior.
+
+
 
 ## Compiling
 TODO
