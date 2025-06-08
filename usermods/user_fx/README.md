@@ -6,11 +6,13 @@ Multiple Effects can be specified inside this single usermod, as we will illustr
 
 
 ## How It Works
-*  - This is where 
+
+The `user_fx.cpp` file can be broken down into five main parts:
+* **static effect definition** - This is a static LED setting that is displayed if an effect fails to initialize. 
 * Usermod Class definition(s)
  
-### static effect definition
-This is a static LED setting that is displayed if an effect fails to initialize.  
+### 
+ 
 Currently set in the code have the pixels be all black, but can be modified to take on a different behavior.  For example, say you wanted to...
 TODO
 
