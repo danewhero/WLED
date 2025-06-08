@@ -5,6 +5,7 @@ This Usermod is a common place to put various user's private LED Effects.  It gi
 Multiple Effects can be specified inside this single usermod, as we will illustrate below.  You will be able to define them with custom names, sliders, etc. as with any other Effect.
 
 
+
 ## How The Usermod Works
 
 The `user_fx.cpp` file can be broken down into four main parts:
