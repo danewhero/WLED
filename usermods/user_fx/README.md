@@ -5,23 +5,27 @@ This Usermod is a common place to put various user's private LED Effects.  It gi
 Multiple Effects can be specified inside this single usermod, as we will illustrate below.  You will be able to define them with custom names, sliders, etc. as with any other Effect.
 
 
-## How It Works
+## How The Usermod Works
 
-The `user_fx.cpp` file can be broken down into five main parts:
-* **static effect definition** - This is a static LED setting that is displayed if an effect fails to initialize. 
-* Usermod Class definition(s)
- 
-### 
+The `user_fx.cpp` file can be broken down into four main parts:
+* **static effect definition** - This is a static LED setting that is displayed if an effect fails to initialize.
+* User FX function definition(s) - This area is where you place the FX code for all of the custom effects you want to use.  This mainly includes the FX code and the static variable containing the [metadata string](https://kno.wled.ge/interfaces/json-api/#effect-metadata). 
+* Usermod Class definition(s) - The class definition defines the blueprint from which all your custom Effects (or any usermod, for that matter) are created.
+* Usermod registration - All usermods have to be registered so that they are able to be compiled into your binary.
+
+We will go into greater detail on how custom effects work in the usermod and how to go abour creating your own in the section below.
+
+
+## Understanding WLED Effects
  
 Currently set in the code have the pixels be all black, but can be modified to take on a different behavior.  For example, say you wanted to...
 TODO
 
-### User FX function definition(s)
-This area is where you place the FX code for all of the custom effects you want to use.
+### 
+
 Pre-loaded in this template is an example 2D Effect called "Diffusion Fire", which is the name that would be shown in the UI once the binary is compiled and run on your device.  We can explore the anatomy of this effect below.
 
-### Usermod Class definition(s)
-The class definition defines the blueprint from which all your custom Effects (or any usermod, for that matter) are created.
+
 
 ## Basic Understanding of C++ and WLED Effects
 
