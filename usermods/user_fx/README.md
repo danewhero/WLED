@@ -21,13 +21,17 @@ We will go into greater detail on how custom effects work in the usermod and how
 
 In this section we give some advice to those who are new to WLED Effect creation.  We will illustrate how to load in multiple Effects using this single usermod, and we will do a deep dive into the anatomy of a 1D Effect as well as a 2D Effect.
 
-The first line of the code imports the `[wled.h](https://kno.wled.ge/interfaces/json-api/#effect-metadata)` file into this module.  This file is the 
+The first line of the code imports the [wled.h](https://github.com/wled/WLED/blob/main/wled00/wled.h) file into this module.  This file handles all other imports and it has all the global variable declarations you'd need for your Effects.
 
-Currently set in the code have the pixels be all black, but can be modified to take on a different behavior.  For example, say you wanted to...
+`#include "wled.h"`
+
+The next code block is the `mode_static` definition.  This is usually left as `SEGMENT.fill(SEGCOLOR(0));` to leave all pixels off if the effect fails to load, but in theory one could use this as a 'fallback effect' to take on a different behavior, such as...
 TODO
- 
 
-Pre-loaded in this template is an example 2D Effect called "Diffusion Fire", which is the name that would be shown in the UI once the binary is compiled and run on your device.  We can explore the anatomy of this effect below.
+Pre-loaded in this template is an example 2D Effect called "Diffusion Fire".  (This is the name that would be shown in the UI once the binary is compiled and run on your device, as defined in the metadata string.)
+The effect starts off by checking to see if the segment that the effect is being applied to is a 2D Matrix, and if it is not, then it returns the static effect which displays no pattern:
+`   if (!strip.isMatrix || !SEGMENT.is2D())
+    return mode_static();  // not a 2D set-up`
 
 
 
