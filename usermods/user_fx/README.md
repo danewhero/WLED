@@ -6,14 +6,24 @@ Multiple Effects can be specified inside this single usermod, as we will illustr
 
 
 ## How It Works
-
-The `user_fx.cpp` file is broken up into several parts:
-* **static effect definition** - This is a static LED setting that is displayed if an effect fails to initialize.  (Currently set in the code have the pixels be all black, but can be modified to take on a different behavior.)
-* **User FX function definition(s)** - This is where 
+*  - This is where 
 * Usermod Class definition(s)
-
-Inside 
+ 
 ### static effect definition
+This is a static LED setting that is displayed if an effect fails to initialize.  
+Currently set in the code have the pixels be all black, but can be modified to take on a different behavior.  For example, say you wanted to...
+TODO
+
+### User FX function definition(s)
+This area is where you place the FX code for all of the custom effects you want to use.
+Pre-loaded in this template is an example 2D Effect called "Diffusion Fire", which is the name that would be shown in the UI once the binary is compiled and run on your device.  We can explore the anatomy of this effect below.
+
+### Usermod Class definition(s)
+The class definition defines the blueprint from which all your custom Effects (or any usermod, for that matter) are created.
+
+## Basic Understanding of C++ and WLED Effects
+
+
 
 ## Installation
 
