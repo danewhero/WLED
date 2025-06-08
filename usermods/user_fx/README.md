@@ -39,26 +39,13 @@ The effect starts off by checking to see if the segment that the effect is being
 if (!strip.isMatrix || !SEGMENT.is2D()) 
 return mode_static();  // not a 2D set-up 
 ```
-The next code block contains several constant variable definitions, which we will walk through one by one:
-* `const int cols = SEG_W;` Assigns the number of columns (width) in the active segment to cols.
+The next code block contains several constant variable definitions which essentially serve to extract the dimensions of the user's 2D matrix and allow WLED to interpret the matrix as a 1D coordinate system (WLED must do this for all 2D animations). We will walk through each line one by one:
+* `const int cols = SEG_W;` -  Assigns the number of columns (width) in the active segment to cols.  SEG_W is a macro defined in WLED that expands to SEGMENT.width().  This value is the width of your 2D matrix segment, used to traverse the matrix correctly.
+* `const int rows = SEG_H;` - Assigns the number of rows (height) in the segment to rows.  SEG_H is a macro for SEGMENT.height(). Combined with cols, this allows pixel addressing in 2D (x, y) space.
+* `const auto XY = [&](int x, int y) { return x + y * cols; };` - Declares a lambda function named XY to convert (x, y) matrix coordinates into a 1D index in the LED array.  This assumes row-major order (left to right, top to bottom).  WLED internally treats the LED strip as a 1D array, so effects must translate 2D coordinates into 1D indices. This lambda helps with that.
 
-SEG_W is a macro defined in WLED that expands to SEGMENT.width().
 
-Why: This is the width of your 2D matrix segment, used to traverse the matrix correctly.
-
-const int rows = SEG_H;
-Meaning: Assigns the number of rows (height) in the segment to rows.
-
-SEG_H is a macro for SEGMENT.height().
-
-Why: Combined with cols, this allows pixel addressing in 2D (x, y) space.
-
-const auto XY = [&](int x, int y) { return x + y * cols; };
-Meaning: Declares a lambda function named XY to convert (x, y) matrix coordinates into a 1D index in the LED array.
-
-Formula: This assumes row-major order (left to right, top to bottom).
-
-Why: WLED internally treats the LED strip as a 1D array, so effects must translate 2D coordinates into 1D indices. This lambda helps with that.
+Next are
 
 const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);
 Meaning: Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.
