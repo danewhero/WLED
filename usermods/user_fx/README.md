@@ -45,10 +45,10 @@ The next code block contains several constant variable definitions which essenti
 * `const auto XY = [&](int x, int y) { return x + y * cols; };` - Declares a lambda function named XY to convert (x, y) matrix coordinates into a 1D index in the LED array.  This assumes row-major order (left to right, top to bottom).  WLED internally treats the LED strip as a 1D array, so effects must translate 2D coordinates into 1D indices. This lambda helps with that.
 
 
-Next are
+The next lines of code further the stup process by defining variables that...
 
-const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);
-Meaning: Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.
+* `const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);`
+  Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.
 
 Why: This determines how often the effect should refresh per second. Higher speed = more frames per second.
 
