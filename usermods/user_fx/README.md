@@ -54,12 +54,30 @@ The next lines of code further the setup process by defining variables that allo
 
 Next we will look at some lines of code that handle memory allocation and effect initialization:
 
-* `unsigned dataSize = SEGMENT.length(); // allocate persistent data for heat value for each pixel` - This part calculates how much memory we need to represent per-pixel state.  SEGMENT.length() returns the total number of LEDs in the current segment (i.e., cols * rows in a matrix).  This fire effect models heat values per pixel (not just colors), so we need persistent storage — one uint8_t per pixel — for the entire effect.
+```unsigned dataSize = SEGMENT.length(); // allocate persistent data for heat value for each pixel```
+* This part calculates how much memory we need to represent per-pixel state.
+* SEGMENT.length() returns the total number of LEDs in the current segment (i.e., cols * rows in a matrix).
+* This fire effect models heat values per pixel (not just colors), so we need persistent storage — one uint8_t per pixel — for the entire effect.
 
+```
+if (!SEGENV.allocateData(dataSize))
+return mode_static(); // allocation failed
+```
+* This section allocates a persistent data buffer tied to the segment environment (SEGENV.data).
+* The syntax SEGENV.allocateData(n) requests a buffer of size n bytes (1 byte per pixel here).
+* If allocation fails (e.g., out of memory), it returns false, and the effect can’t proceed.
+* It calls previously defined mode_static() fallback effect, which just fills the segment with a static color.  We need to do this because WLED needs a fail-safe behavior if a custom effect can't run properly due to memory constraints.
 
-* `if (!SEGENV.allocateData(dataSize))`
-  `return mode_static(); // allocation failed` - This section allocates a persistent data buffer tied to      the segment environment (SEGENV.data).  The syntax SEGENV.allocateData(n) requests a buffer of size n       bytes (1 byte per pixel here).  If allocation fails (e.g., out of memory), it returns false.
-  If data allocation fails, the effect can’t proceed.  It calls mode_static() — a fallback effect defined     earlier in the file that just fills the segment with a static color.  We need to do this because WLED       needs a fail-safe behavior if a custom effect can't run properly due to memory constraints.
+```
+if (SEGENV.call == 0) {
+  SEGMENT.fill(BLACK);
+  SEGENV.step = 0;
+}
+```
+* The first line checks whether this is the first time the effect is being run; SEGENV.call is a counter for how many times this effect function has been invoked since it started.
+* If SEGENV.call equals 0 (which it does on the very first call, making it useful for initialization), then it clears the LED segment by filling it with black (turns off all LEDs).
+* This gives a clean starting point for the fire animation.
+* It also initializes SEGENV.step, a timing marker, to 0.  This value is later used as a timestamp to control when the next animation frame should occur (based on elapsed time).
 
 
 ## Compiling
