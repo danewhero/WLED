@@ -44,8 +44,7 @@ The next code block contains several constant variable definitions which essenti
 * `const int rows = SEG_H;` - Assigns the number of rows (height) in the segment to rows.  SEG_H is a macro for SEGMENT.height(). Combined with cols, this allows pixel addressing in 2D (x, y) space.
 * `const auto XY = [&](int x, int y) { return x + y * cols; };` - Declares a lambda function named XY to convert (x, y) matrix coordinates into a 1D index in the LED array.  This assumes row-major order (left to right, top to bottom).  WLED internally treats the LED strip as a 1D array, so effects must translate 2D coordinates into 1D indices. This lambda helps with that.
 
-
-The next lines of code further the stup process by defining variables that...
+The next lines of code further the setup process by defining variables that allow the effect's settings to be configurable using the UI sliders (or alternatively, through API calls):
 
 * `const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);` - Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.  This determines how often the effect should refresh per second (Higher speed = more frames per second).
 * `const unsigned refresh_ms = 1000 / refresh_hz;` - Converts refresh rate from Hz to milliseconds. It’s easier to schedule animation updates in WLED using elapsed time in milliseconds. This value is used to time when to update the effect.
@@ -53,6 +52,16 @@ The next lines of code further the stup process by defining variables that...
 * `const uint8_t spark_rate = SEGMENT.intensity;` - Assigns SEGMENT.intensity (user input 0–255) to a variable named spark_rate.  Controls how frequently new "spark" pixels appear at the bottom of the matrix. A higher value means more frequent ignition of flame points.
 * `const uint8_t turbulence = SEGMENT.custom2;` - Stores the user-defined custom2 value to a variable called turbulence.  This is used to introduce randomness in spark generation or flow — more turbulence means more chaotic behavior.
 
+Next we will look at some lines of code that handle memory allocation and effect initialization:
+
+* `unsigned dataSize = SEGMENT.length(); // allocate persistent data for heat value for each pixel` - This part calculates how much memory we need to represent per-pixel state.  SEGMENT.length() returns the total number of LEDs in the current segment (i.e., cols * rows in a matrix).  This fire effect models heat values per pixel (not just colors), so we need persistent storage — one uint8_t per pixel — for the entire effect.
+
+```
+if (!SEGENV.allocateData(dataSize))
+* return mode_static(); // allocation failed
+```
+This section allocates a persistent data buffer tied to the segment environment (SEGENV.data).  The syntax SEGENV.allocateData(n) requests a buffer of size n bytes (1 byte per pixel here).  If allocation fails (e.g., out of memory), it returns false.
+If data allocation fails, the effect can’t proceed.  It calls mode_static() — a fallback effect defined earlier in the file that just fills the segment with a static color.  We need to do this because WLED needs a fail-safe behavior if a custom effect can't run properly due to memory constraints.
 
 
 ## Compiling
