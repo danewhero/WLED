@@ -47,30 +47,11 @@ The next code block contains several constant variable definitions which essenti
 
 The next lines of code further the stup process by defining variables that...
 
-* `const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);`
-  Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.
-
-Why: This determines how often the effect should refresh per second. Higher speed = more frames per second.
-
-const unsigned refresh_ms = 1000 / refresh_hz;
-Meaning: Converts refresh rate from Hz to milliseconds.
-
-Why: It’s easier to schedule animation updates in WLED using elapsed time in milliseconds. This value is used to time when to update the effect.
-
-const int16_t diffusion = map(SEGMENT.custom1, 0, 255, 0, 100);
-Meaning: Uses the custom1 control (0–255 range, usually exposed via sliders) to define the diffusion rate, mapped to 0–100.
-
-Why: This controls how much "heat" spreads to neighboring pixels — more diffusion = smoother flame spread.
-
-const uint8_t spark_rate = SEGMENT.intensity;
-Meaning: Assigns SEGMENT.intensity (user input 0–255) to a variable named spark_rate.
-
-Why: Controls how frequently new "spark" pixels appear at the bottom of the matrix. A higher value means more frequent ignition of flame points.
-
-const uint8_t turbulence = SEGMENT.custom2;
-Meaning: Stores the user-defined custom2 value to a variable called turbulence.
-
-Why: This is used to introduce randomness in spark generation or flow — more turbulence means more chaotic behavior.
+* `const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);` - Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.  This determines how often the effect should refresh per second (Higher speed = more frames per second).
+* `const unsigned refresh_ms = 1000 / refresh_hz;` - Converts refresh rate from Hz to milliseconds. It’s easier to schedule animation updates in WLED using elapsed time in milliseconds. This value is used to time when to update the effect.
+* `const int16_t diffusion = map(SEGMENT.custom1, 0, 255, 0, 100);` - Uses the custom1 control (0–255 range, usually exposed via sliders) to define the diffusion rate, mapped to 0–100.  This controls how much "heat" spreads to neighboring pixels — more diffusion = smoother flame spread.
+* `const uint8_t spark_rate = SEGMENT.intensity;` - Assigns SEGMENT.intensity (user input 0–255) to a variable named spark_rate.  Controls how frequently new "spark" pixels appear at the bottom of the matrix. A higher value means more frequent ignition of flame points.
+* `const uint8_t turbulence = SEGMENT.custom2;` - Stores the user-defined custom2 value to a variable called turbulence.  This is used to introduce randomness in spark generation or flow — more turbulence means more chaotic behavior.
 
 
 
