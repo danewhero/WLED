@@ -89,6 +89,16 @@ if ((strip.now - SEGENV.step) >= refresh_ms) {
   uint8_t tmp_row[cols];
   SEGENV.step = strip.now;
   // scroll up
+```
+* The first line checks if it's time to update the effect frame.  `strip.now` is the current timestamp in milliseconds; `SEGENV.step` is the last update time (set during initialization or previous frame).  `refresh_ms` is how long to wait between frames, computed earlier based on SEGMENT.speed.
+  * The conditional statement in the first line fo code ensures the effect updates on a fixed interval — e.g., every 20 ms for 50 Hz.
+* The second line of code declares a temporary row buffer for intermediate diffusion results that is one byte per column (horizontal position), so this buffer holds one row's worth of heat values.
+* You'll see later that it writes results here before updating `SEGMENT.data`.
+  * Note that this is declared on the stack each frame. Since the number of columns is typically small (e.g. ≤ 16), it's efficient.
+* The third line of code updates the frame timing marker to now., so the next frame won't happen until the next `refresh_ms` interval has passed.
+
+The comment block `// scroll up` introduces the next block: it performs a scrolling effect by copying data upward.  Breaking donw this section, we have:
+```
   for (unsigned y = 1; y < rows; y++)
     for (unsigned x = 0; x < cols; x++) {
       unsigned src = XY(x, y);
@@ -96,11 +106,17 @@ if ((strip.now - SEGENV.step) >= refresh_ms) {
       SEGMENT.data[dst] = SEGMENT.data[src];
     }
 ```
-* The first line checks if it's time to update the effect frame.  `strip.now` is the current timestamp in milliseconds; `SEGENV.step` is the last update time (set during initialization or previous frame).  `refresh_ms` is how long to wait between frames, computed earlier based on SEGMENT.speed.
-* The conditional statement in the first line fo code ensures the effect updates on a fixed interval — e.g., every 20 ms for 50 Hz.
-* The second line of code declares a temporary row buffer for intermediate diffusion results that is one byte per column (horizontal position), so this buffer holds one row's worth of heat values.
-* You'll see later that it writes results here before updating `SEGMENT.data`.
-  * Note that this is declared on the stack each frame. Since the number of columns is typically small (e.g. ≤ 16), it's efficient.
+* First, this code begins a loop over rows, starting from the second row (y = 1) up to the last row.  (We skip row 0 because it will be overwritten.)
+  * The code then has an inner loop for the columns, i.e., left to right.
+* The next line computes the source index in the 1D data array at position (x, y).
+* Next, we compute the destination index directly above the source (one row up).
+* The final line of code in this block performs the actual scroll: it copies the pixel's "heat" value from the row below.  This simulates heat rising upward, like flame or smoke.
+* This creates the core fluid motion of the fire — older heat moves upward, and new heat (from sparks) will later be injected at the bottom row.
+
+
+
+
+
 
 
 
