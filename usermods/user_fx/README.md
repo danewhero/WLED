@@ -113,8 +113,24 @@ The comment block `// scroll up` introduces the next block: it performs a scroll
 * The final line of code in this block performs the actual scroll: it copies the pixel's "heat" value from the row below.  This simulates heat rising upward, like flame or smoke.
 * This creates the core fluid motion of the fire — older heat moves upward, and new heat (from sparks) will later be injected at the bottom row.
 
-
-
+Now we get to the spark generation portion, where new bursts of heat appear at the bottom of the matrix:
+```
+if (hw_random8() > turbulence) {
+  // create new sparks at bottom row
+  for (unsigned x = 0; x < cols; x++) {
+    uint8_t p = hw_random8();
+    if (p < spark_rate) {
+      unsigned dst = XY(x, rows - 1);
+      SEGMENT.data[dst] = 255;
+    }
+  }
+}
+```
+* The first line randomizes whether we even attempt to spawn sparks this frame.
+  * `hw_random8()` gives a random number between 0–255 using a fast hardware RNG.
+  * `turbulence` is a user-controlled parameter (`SEGMENT.custom2`, set earlier).  Higher turbulence means this block is less likely to run (because `hw_random8()` is less likely to exceed a high threshold).  This adds randomness to when sparks appear — simulating natural flicker and chaotic fire.
+* Next we loop over all columns in the bottom row (row `rows - 1`).
+* Another random number `p` is used to probabilistically decide whether a spark appears at this `(x, rows-1)` position.
 
 
 
