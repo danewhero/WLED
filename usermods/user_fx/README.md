@@ -54,7 +54,9 @@ The next lines of code further the setup process by defining variables that allo
 
 Next we will look at some lines of code that handle memory allocation and effect initialization:
 
-```unsigned dataSize = SEGMENT.length(); // allocate persistent data for heat value for each pixel```
+```
+unsigned dataSize = SEGMENT.length();
+```
 * This part calculates how much memory we need to represent per-pixel state.
 * `SEGMENT.length()` returns the total number of LEDs in the current segment (i.e., cols * rows in a matrix).
 * This fire effect models heat values per pixel (not just colors), so we need persistent storage — one uint8_t per pixel — for the entire effect.
