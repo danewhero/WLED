@@ -19,12 +19,12 @@ We will go into greater detail on how custom effects work in the usermod and how
 
 ## Basic Syntax for WLED Effect Creation
 Below are some helpful variables and functions to know as you start your journey towards WLED effect creation:
-* SEGMENT.intensity / speed / custom1 etc.
-* SEGENV.call / step / aux0 / aux1
-* SEGLEN / SEG_W / SEG_H variables (and the fact that these can change at any time if user sets new segment size)
-* SEGCOLOR(x) / SEGPALETTE for user colors from UI (and how it relates to meta string)
+* **SEGMENT.intensity / speed / custom1 etc.** -> This syntax helps define the UI sliders that can make certain elements of your running code editable by the user.  (These can be controlled by the API as well.)
+* **SEGENV.call / step / aux0 / aux1** - these are useful counters for you to use in your code.  
+* **SEGLEN / SEG_W / SEG_H** -> These variables help define the length and width of your LED strip/matrix.  They can be changed at any time if the user sets new segment size(s).
+* **SEGCOLOR(x) / SEGPALETTE** for user colors from UI (and how it relates to meta string)
 * explaining available functions for pixel drawing (the ones defined in FX_2Dfcn and FX_fcn, like move(), blur() etc.)
-* SEGMENT.color_from_palette() function (which should be favoured over ColorFromPalette())
+* **SEGMENT.color_from_palette()** function (which should be favoured over ColorFromPalette())
 
 
 ## Understanding 2D WLED Effects
@@ -226,14 +226,19 @@ return FRAMETIME;
 * ⚠️ Important: Because the actual frame logic is gated by strip.now - SEGENV.step, returning FRAMETIME here doesn’t cause excessive updates — it just keeps the engine responsive.
 * The final bracket closes the `mode_diffusionfire()` function itself.
 
-At the end of every effect is an important line of code called the metadata string.  
+### The Metadata String
+At the end of every effect is an important line of code called the **metadata string**.  
 It defines how the effect is to be interacted with in the UI:
 ```
 static const char _data_FX_MODE_DIFFUSIONFIRE[] PROGMEM = "Diffusion Fire@!,Spark rate,Diffusion Speed,Turbulence,,Use palette;;Color;;2;pal=35";
 ```
+This string is passed into `strip.addEffect()` and parsed by WLED to determine how your effect appears and behaves in the UI. 
+Let's break it down field by field, following WLED's metadata format.
+The string format WLED uses is semicolon-separated sections, with commas used for control labels.
+Let’s split this into logical sections (delimited by semicolons ;):
+**TODO**
 
-
-## The UserFxUsermod Class
+### The UserFxUsermod Class
 
 The `UserFxUsermod` class registers the `mode_diffusionfire` effect with WLED. This section starts right after the effect function and metadata string, and is responsible for making the effect usable in the WLED interface:
 ```
@@ -283,7 +288,11 @@ REGISTER_USERMOD(user_fx);
 
 ## Understanding 1D WLED Effects
 
-So now let's say that in addition to the custom "Dussion Fire" effect detailed above, you also want to add the "Police" effect through this same Usermod file.  The Police effect was removed from WLED after v0.14.0, but through this guide, we will illustrate how to add it back in addition to the custom Diffusion Fire effect:
+**TODO**
+
+## Combining Multiple Effects in this Usermod
+
+So now let's say that in addition to the custom "Diffusion Fire" effect detailed above, you also want to add the "Police" effect through this same Usermod file.  The Police effect was removed from WLED after v0.14.0, but through this guide, we will illustrate how to add it back into your WLED build, along with the custom Diffusion Fire effect:
 * Navigate to the code for the Police effect [here](https://github.com/wled/WLED/blob/ef0f91d8d07c7aad2ed55f293f01cac3ef43976d/wled00/FX.cpp#L1226).
 * Copy this code, and place it below the metadata string for Diffusion Fire.
 * Add a [metadata string](https://kno.wled.ge/interfaces/json-api/#effect-metadata) for the effect.
@@ -291,7 +300,7 @@ So now let's say that in addition to the custom "Dussion Fire" effect detailed a
 * Compile the code.
 
 ## Compiling
-TODO
+[The complete guide to compiling WLED can be found here](https://kno.wled.ge/advanced/compiling-wled/), on the offical WLED documentation website.
 
 
 ## Change Log
