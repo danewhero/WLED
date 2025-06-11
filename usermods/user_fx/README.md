@@ -165,8 +165,64 @@ for (unsigned y = 0; y < rows; y++) {
     tmp_row[x] = min(255, (int)(v * 100 / (300 + diffusion)));
   }
 ```
-* This block of code starts by looping over each row from top to bottom.  (We'll do diffusion and then color-rendering for each pixel row.)
-* Next comes in inner loop which iterates across each column in the current row.
+* This block of code starts by looping over each row from top to bottom.  (We will do diffusion for each pixel row.)
+* Next we start an inner loop which iterates across each column in the current row.
+* Starting with the current heat value of pixel (x, y) assigned `v`:
+  * if there’s a pixel to the left, add its heat to the total.
+  * If there’s a pixel to the right, add its heat as well.
+  * So essentially, what the two `if` statements accomplish is: `v = center + left + right`.
+* The final line of code applies diffusion smoothing:
+  * The denominator controls how much the neighboring heat contributes. `300 + diffusion` means that with higher diffusion, you get more smoothing (since the sum is divided more).
+  * The `v * 100` scales things before dividing (preserving some dynamic range).
+  * `min(255, ...)` clamps the result to 8-bit range.
+  * This entire line of code stores the smoothed heat into the temporary row buffer.
+
+After calculating tmp_row, we now handle rendering the pixels by updating the actual segment data and turning 'heat' into visible colors:
+```
+  for (unsigned x = 0; x < cols; x++) {
+    SEGMENT.data[XY(x, y)] = tmp_row[x];
+    if (SEGMENT.check1) {
+      uint32_t color = ColorFromPalette(SEGPALETTE, tmp_row[x], 255, LINEARBLEND_NOWRAP);
+      SEGMENT.setPixelColorXY(x, y, color);
+    } else {
+      uint32_t color = SEGCOLOR(0);
+      SEGMENT.setPixelColorXY(x, y, color_fade(color, tmp_row[x]));
+    }
+  }
+}
+```
+* This next loop starts iterating over each row from top to bottom.  (We're now doing this for color-rendering for each pixel row.)
+* Next we update the main segment data with the smoothed value for this pixel.
+* The if statement creates a conditional rendering path — the user can toggle this.  If `check1` is enabled in the effect metadata, we use a color palette to display the flame.
+* The next line converts the heat value (`tmp_row[x]`) into a `color` from the current palette with 255 brightness, and no wrapping in palette lookup.
+  * This creates rich gradient flames (e.g., yellow → red → black).
+* Finally we set the rendered color for the pixel (x, y).
+  * This repeats for each pixel  in each row.
+* If palette use is disabled, we fallback to fading a base color.
+* `SEGCOLOR(0)` gets the first user-selected color for the segment.
+* The final line of code fades that base color according to the heat value (acts as brightness multiplier).
+
+
+
+
+
+
+
+
+
+* Next we start to iterate across each column in the current row.
+* Starting with the current heat value of pixel (x, y), assigned to `v` again:
+  * If there’s a pixel to the left, add its heat to the total.
+  * If there’s a pixel to the right, add its heat as well.
+
+
+
+
+
+
+
+
+
 
 
 
