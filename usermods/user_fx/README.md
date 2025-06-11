@@ -21,7 +21,7 @@ We will go into greater detail on how custom effects work in the usermod and how
 Below are some helpful variables and functions to know as you start your journey towards WLED effect creation:
 * **SEGMENT.intensity / speed / custom1 etc.** -> This syntax helps define the UI sliders that can make certain elements of your running code editable by the user.  (These can be controlled by the API as well.)
 * **SEGENV.call / step / aux0 / aux1** - these are useful counters for you to use in your code.  
-* **SEGLEN / SEG_W / SEG_H** -> These variables help define the length and width of your LED strip/matrix.  They can be changed at any time if the user sets new segment size(s).
+* **SEGLEN / SEG_W / SEG_H** -> These variables are macros that help define the length and width of your LED strip/matrix segment.  They can be changed at any time if the user sets new segment size(s).
 * **SEGCOLOR(x) / SEGPALETTE** for user colors from UI (and how it relates to meta string)
 * explaining available functions for pixel drawing (the ones defined in FX_2Dfcn and FX_fcn, like move(), blur() etc.)
 * **SEGMENT.color_from_palette()** function (which should be favoured over ColorFromPalette())
