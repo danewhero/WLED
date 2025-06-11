@@ -53,12 +53,24 @@ const auto XY = [&](int x, int y) { return x + y * cols; };
   * WLED internally treats the LED strip as a 1D array, so effects must translate 2D coordinates into 1D indices. This lambda helps with that.
 
 The next lines of code further the setup process by defining variables that allow the effect's settings to be configurable using the UI sliders (or alternatively, through API calls):
-
-* `const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);` - Maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.  This determines how often the effect should refresh per second (Higher speed = more frames per second).
-* `const unsigned refresh_ms = 1000 / refresh_hz;` - Converts refresh rate from Hz to milliseconds. It’s easier to schedule animation updates in WLED using elapsed time in milliseconds. This value is used to time when to update the effect.
-* `const int16_t diffusion = map(SEGMENT.custom1, 0, 255, 0, 100);` - Uses the custom1 control (0–255 range, usually exposed via sliders) to define the diffusion rate, mapped to 0–100.  This controls how much "heat" spreads to neighboring pixels — more diffusion = smoother flame spread.
-* `const uint8_t spark_rate = SEGMENT.intensity;` - Assigns SEGMENT.intensity (user input 0–255) to a variable named spark_rate.  Controls how frequently new "spark" pixels appear at the bottom of the matrix. A higher value means more frequent ignition of flame points.
-* `const uint8_t turbulence = SEGMENT.custom2;` - Stores the user-defined custom2 value to a variable called turbulence.  This is used to introduce randomness in spark generation or flow — more turbulence means more chaotic behavior.
+```
+const uint8_t refresh_hz = map(SEGMENT.speed, 0, 255, 20, 80);
+const unsigned refresh_ms = 1000 / refresh_hz;
+const int16_t diffusion = map(SEGMENT.custom1, 0, 255, 0, 100);
+const uint8_t spark_rate = SEGMENT.intensity;
+const uint8_t turbulence = SEGMENT.custom2;
+```
+* The first line maps the SEGMENT.speed (user-controllable parameter from 0–255) to a value between 20 and 80 Hz.
+  * This determines how often the effect should refresh per second (Higher speed = more frames per second).
+* Next we convert refresh rate from Hz to milliseconds. (It’s easier to schedule animation updates in WLED using elapsed time in milliseconds.)
+  * This value is used to time when to update the effect.
+* The third line utilizes the `custom1` control (0–255 range, usually exposed via sliders) to define the diffusion rate, mapped to 0–100.
+  * This controls how much "heat" spreads to neighboring pixels — more diffusion = smoother flame spread.
+* Next we assign `SEGMENT.intensity` (user input 0–255) to a variable named `spark_rate`.
+  * This controls how frequently new "spark" pixels appear at the bottom of the matrix.
+  * A higher value means more frequent ignition of flame points.
+* The final line stores the user-defined `custom2` value to a variable called `turbulence`.
+  * This is used to introduce randomness in spark generation or flow — more turbulence means more chaotic behavior.
 
 Next we will look at some lines of code that handle memory allocation and effect initialization:
 
@@ -66,8 +78,8 @@ Next we will look at some lines of code that handle memory allocation and effect
 unsigned dataSize = SEGMENT.length();
 ```
 * This part calculates how much memory we need to represent per-pixel state.
-* `SEGMENT.length()` returns the total number of LEDs in the current segment (i.e., cols * rows in a matrix).
-* This fire effect models heat values per pixel (not just colors), so we need persistent storage — one uint8_t per pixel — for the entire effect.
+  * `SEGMENT.length()` returns the total number of LEDs in the current segment (i.e., cols * rows in a matrix).
+  * This fire effect models heat values per pixel (not just colors), so we need persistent storage — one uint8_t per pixel — for the entire effect.
 
 ```
 if (!SEGENV.allocateData(dataSize))
