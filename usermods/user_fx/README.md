@@ -17,6 +17,16 @@ The `user_fx.cpp` file can be broken down into four main parts:
 We will go into greater detail on how custom effects work in the usermod and how to go abour creating your own in the section below.
 
 
+## Basic Syntax for WLED Effect Creation
+Below are some helpful variables and functions to know as you start your journey towards WLED effect creation:
+* SEGMENT.intensity / speed / custom1 etc.
+* SEGENV.call / step / aux0 / aux1
+* SEGLEN / SEG_W / SEG_H variables (and the fact that these can change at any time if user sets new segment size)
+* SEGCOLOR(x) / SEGPALETTE for user colors from UI (and how it relates to meta string)
+* explaining available functions for pixel drawing (the ones defined in FX_2Dfcn and FX_fcn, like move(), blur() etc.)
+* SEGMENT.color_from_palette() function (which should be favoured over ColorFromPalette())
+
+
 ## Understanding 2D WLED Effects
 
 In this section we give some advice to those who are new to WLED Effect creation.  We will illustrate how to load in multiple Effects using this single usermod, and we will do a deep dive into the anatomy of a 1D Effect as well as a 2D Effect.
@@ -271,7 +281,14 @@ REGISTER_USERMOD(user_fx);
 * The last line is a macro that tells WLED: “This is a valid usermod — load it during startup.”
   * WLED adds it to the list of active usermods, calls `setup()` and `loop()`, and lets it interact with the system.
 
+## Understanding 1D WLED Effects
 
+So now let's say that in addition to the custom "Dussion Fire" effect detailed above, you also want to add the "Police" effect through this same Usermod file.  The Police effect was removed from WLED after v0.14.0, but through this guide, we will illustrate how to add it back in addition to the custom Diffusion Fire effect:
+* Navigate to the code for the Police effect [here](https://github.com/wled/WLED/blob/ef0f91d8d07c7aad2ed55f293f01cac3ef43976d/wled00/FX.cpp#L1226).
+* Copy this code, and place it below the metadata string for Diffusion Fire.
+* Add a [metadata string](https://kno.wled.ge/interfaces/json-api/#effect-metadata) for the effect.
+* Register the effect using the `addEffect` function in the Usermod class.
+* Compile the code.
 
 ## Compiling
 TODO
