@@ -17,9 +17,10 @@ The `user_fx.cpp` file can be broken down into four main parts:
 We will go into greater detail on how custom effects work in the usermod and how to go abour creating your own in the section below.
 
 
-## Understanding WLED Effects
+## Understanding 2D WLED Effects
 
 In this section we give some advice to those who are new to WLED Effect creation.  We will illustrate how to load in multiple Effects using this single usermod, and we will do a deep dive into the anatomy of a 1D Effect as well as a 2D Effect.
+(Special thanks to @mryndzionek for offering this "Diffusion Fire" 2D Effect for this tutorial.)
 
 ### Imports
 The first line of the code imports the [wled.h](https://github.com/wled/WLED/blob/main/wled00/wled.h) file into this module.  This file handles all other imports and it has all the global variable declarations you'd need for your Effects.
@@ -121,6 +122,52 @@ if ((strip.now - SEGENV.step) >= refresh_ms) {
 * The second line of code declares a temporary row buffer for intermediate diffusion results that is one byte per column (horizontal position), so this buffer holds one row's worth of heat values.
 * You'll see later that it writes results here before updating `SEGMENT.data`.
   * Note that this is declared on the stack each frame. Since the number of columns is typically small (e.g. ≤ 16), it's efficient.
+
+Now we get to the spark generation portion, where new bursts of heat appear at the bottom of the matrix:
+```
+if (hw_random8() > turbulence) {
+  // create new sparks at bottom row
+  for (unsigned x = 0; x < cols; x++) {
+    uint8_t p = hw_random8();
+    if (p < spark_rate) {
+      unsigned dst = XY(x, rows - 1);
+      SEGMENT.data[dst] = 255;
+    }
+  }
+}
+```
+* The first line randomizes whether we even attempt to spawn sparks this frame.
+  * `hw_random8()` gives another random number between 0–255 using a fast hardware RNG, as described above.
+  * `turbulence` is a user-controlled parameter (SEGMENT.custom2, set earlier).
+  * Higher turbulence means this block is less likely to run (because `hw_random8()` is less likely to exceed a high threshold).
+  * This adds randomness to when sparks appear — simulating natural flicker and chaotic fire.
+* The next line loops over all columns in the bottom row (row `rows - 1`).
+* Another random number, `p`, is used to probabilistically decide whether a spark appears at this (x, `rows-1`) position.
+* Next is a conditional statement.  The lower spark_rate is, the fewer sparks will appear.
+  * `spark_rate` comes from `SEGMENT.intensity` (0–255).
+  * High intensity means more frequent ignition.
+* `dst` calculates the destination index in the bottom row at column x.
+* The final line here sets the heat at this pixel to maximum (255).
+  * This simulates a fresh burst of flame, which will diffuse and move upward over time in subsequent frames.
+
+Next we reach the first part of the core of the fire simulation, which is diffusion (how heat spreads to neighboring pixels):
+```
+// diffuse
+for (unsigned y = 0; y < rows; y++) {
+  for (unsigned x = 0; x < cols; x++) {
+    unsigned v = SEGMENT.data[XY(x, y)];
+    if (x > 0) {
+      v += SEGMENT.data[XY(x - 1, y)];
+    }
+    if (x < (cols - 1)) {
+      v += SEGMENT.data[XY(x + 1, y)];
+    }
+    tmp_row[x] = min(255, (int)(v * 100 / (300 + diffusion)));
+  }
+```
+* This block of code starts by looping over each row from top to bottom.  (We'll do diffusion and then color-rendering for each pixel row.)
+* Next comes in inner loop which iterates across each column in the current row.
+
 
 
 
