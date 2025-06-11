@@ -202,31 +202,74 @@ After calculating tmp_row, we now handle rendering the pixels by updating the ac
 * `SEGCOLOR(0)` gets the first user-selected color for the segment.
 * The final line of code fades that base color according to the heat value (acts as brightness multiplier).
 
+The final piece of this custom effect returns the frame time:
+```
+}
+return FRAMETIME;
+}
+```
+* The first bracket closes the `if ((strip.now - SEGENV.step) >= refresh_ms)` block that started back on line 39.
+  * It ensures that the fire simulation (scrolling, sparking, diffusion, rendering) only runs when enough time has passed since the last update.
+* returning the frame time tells WLED how soon this effect wants to be called again.
+  * `FRAMETIME` is a predefined macro in WLED, typically set to ~16ms, corresponding to ~60 FPS (frames per second).
+  * Even though the effect logic itself controls when to update based on refresh_ms, WLED will still call this function at roughly FRAMETIME intervals to check whether an update is needed.
+* ⚠️ Important: Because the actual frame logic is gated by strip.now - SEGENV.step, returning FRAMETIME here doesn’t cause excessive updates — it just keeps the engine responsive.
+* The final bracket closes the `mode_diffusionfire()` function itself.
+
+At the end of every effect is an important line of code called the metadata string.  
+It defines how the effect is to be interacted with in the UI:
+```
+static const char _data_FX_MODE_DIFFUSIONFIRE[] PROGMEM = "Diffusion Fire@!,Spark rate,Diffusion Speed,Turbulence,,Use palette;;Color;;2;pal=35";
+```
 
 
+## The UserFxUsermod Class
 
+The `UserFxUsermod` class registers the `mode_diffusionfire` effect with WLED. This section starts right after the effect function and metadata string, and is responsible for making the effect usable in the WLED interface:
+```
+class UserFxUsermod : public Usermod {
+ private:
+ public:
+  void setup() override {
+    strip.addEffect(255, &mode_diffusionfire, _data_FX_MODE_DIFFUSIONFIRE);
 
+    ////////////////////////////////////////
+    //  add your effect function(s) here  //
+    ////////////////////////////////////////
 
+    // use id=255 for all custom user FX (the final id is assigned when adding the effect)
 
+    // strip.addEffect(255, &mode_your_effect, _data_FX_MODE_YOUR_EFFECT);
+    // strip.addEffect(255, &mode_your_effect2, _data_FX_MODE_YOUR_EFFECT2);
+    // strip.addEffect(255, &mode_your_effect3, _data_FX_MODE_YOUR_EFFECT3);
+  }
+  void loop() override {} // nothing to do in the loop
+  uint16_t getId() override { return USERMOD_ID_USER_FX; }
+};
+```
+* The first line declares a new class called UserFxUsermod. It inherits from `Usermod`, which is the base class WLED uses for any pluggable user-defined modules.
+  * This makes UserFxUsermod a valid WLED extension that can hook into `setup()`, `loop()`, and other lifecycle events.
+* The `void setup()` function runs once when WLED initializes the usermod.
+  * It's where you should register your effects, initialize hardware, or do any other setup logic.
+  * `override` ensures that this matches the Usermod base class definition.
+* The `strip.addEffect` line is an important one that registers the custom effect so WLED knows about it.
+  * 255: Temporary ID — WLED will assign a unique ID automatically.  (**Create all custom effects with the 255 ID.**)
+  * `&mode_diffusionfire`: Pointer to the effect function.
+  * `_data_FX_MODE_DIFFUSIONFIRE`: Metadata string stored in PROGMEM, describing the effect name and UI fields (like sliders).
+  * After this, your custom effect shows up in the WLED effects list.
+* The `loop()` function remains empty because this usermod doesn’t need to do anything continuously. WLED still calls this every main loop, but nothing is done here.
+  * If your usermod had to respond to input or update state, you'd do it here.
+* The last part returns a unique ID constant used to identify this usermod.
+  * USERMOD_ID_USER_FX is defined in [const.h](https://github.com/wled/WLED/blob/main/wled00/const.h). WLED uses this for tracking, debugging, or referencing usermods internally.
 
-
-* Next we start to iterate across each column in the current row.
-* Starting with the current heat value of pixel (x, y), assigned to `v` again:
-  * If there’s a pixel to the left, add its heat to the total.
-  * If there’s a pixel to the right, add its heat as well.
-
-
-
-
-
-
-
-
-
-
-
-
-
+The final part of this file handles instatiation and initialization:
+```
+static UserFxUsermod user_fx;
+REGISTER_USERMOD(user_fx);
+```
+* The first line creates a single, global instance of your usermod class.
+* The last line is a macro that tells WLED: “This is a valid usermod — load it during startup.”
+  * WLED adds it to the list of active usermods, calls `setup()` and `loop()`, and lets it interact with the system.
 
 
 
